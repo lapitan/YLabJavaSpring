@@ -1,6 +1,7 @@
 package com.edu.ulab.app.mapper;
 
 import com.edu.ulab.app.dto.UserDto;
+import com.edu.ulab.app.entity.UserEntity;
 import com.edu.ulab.app.web.request.UserRequest;
 import com.edu.ulab.app.web.request.UserRequestWithId;
 import javax.annotation.processing.Generated;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-09-19T19:05:47+0300",
+    date = "2022-09-21T17:59:11+0300",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.3.1 (Oracle Corporation)"
 )
 @Component
@@ -58,5 +59,20 @@ public class UserMapperImpl implements UserMapper {
         userDto.setAge( userRequestWithId.getAge() );
 
         return userDto;
+    }
+
+    @Override
+    public UserEntity userDtoToUserEntity(UserDto userDto) {
+        if ( userDto == null ) {
+            return null;
+        }
+
+        UserEntity userEntity = new UserEntity();
+
+        userEntity.setId( userDto.getId() );
+        userEntity.setTitle( userDto.getTitle() );
+        userEntity.setAge( userDto.getAge() );
+
+        return userEntity;
     }
 }

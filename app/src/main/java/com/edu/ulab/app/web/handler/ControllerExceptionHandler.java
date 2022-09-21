@@ -1,5 +1,6 @@
 package com.edu.ulab.app.web.handler;
 
+import com.edu.ulab.app.exception.DataBaseException;
 import com.edu.ulab.app.exception.NotFoundException;
 import com.edu.ulab.app.web.response.BaseWebResponse;
 import lombok.NonNull;
@@ -19,6 +20,14 @@ public class ControllerExceptionHandler {
         log.error(exc.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new BaseWebResponse(createErrorMessage(exc)));
+    }
+
+    @ExceptionHandler(DataBaseException.class)
+    public ResponseEntity<BaseWebResponse> handleDataBaseException(@NonNull final DataBaseException exception){
+        log.error(exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new BaseWebResponse(createErrorMessage(exception)));
     }
 
     private String createErrorMessage(Exception exception) {

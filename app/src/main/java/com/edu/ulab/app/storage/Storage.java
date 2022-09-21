@@ -4,10 +4,13 @@ import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.entity.BookEntity;
 import com.edu.ulab.app.entity.UserEntity;
+import com.edu.ulab.app.exception.CantAccessException;
+import com.edu.ulab.app.exception.DataBaseException;
 import com.edu.ulab.app.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.print.Book;
+import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +25,10 @@ public class Storage {
     // продумать что у узера может быть много книг и нужно создать эту связь
     // так же учесть, что методы хранилища принимают друго тип данных - учесть это в абстракции
     private static Storage instance;
-    private HashMap<Long, BookEntity> bookEntities;
-    private Long currBookId;
-    private HashMap<Long, UserEntity> userEntities;
-    private Long currUserId;
+
+    private BookStorage bookStorage;
+
+    private UserStorage userStorage;
 
     public static Storage createStorage() {
         if (instance == null) {
@@ -35,87 +38,70 @@ public class Storage {
     }
 
     private Storage() {
-        bookEntities = new HashMap<>();
-        userEntities = new HashMap<>();
-        currUserId = 0L;
-        currBookId = 0L;
+        bookStorage = new BookStorage();
+        userStorage = new UserStorage();
     }
 
     public UserDto createUser(UserDto userDto) {
-        userDto.setId(currUserId);
-        currUserId++;
-        UserEntity userEntity = new UserEntity(userDto);
-        userEntities.put(userEntity.getId(), userEntity);
-        userDto = userEntity.makeUserDto();
 
-        log.info("created new user with id:{}", userEntity.getId());
-
+        workCheck();
+        userDto = userStorage.createUser(userDto);
+        log.info("created new user with id:{}", userDto.getId());
         return userDto;
     }
 
     public BookDto createBook(BookDto bookDto) {
-        bookDto.setId(currBookId);
-        currBookId++;
-        userEntities.get(bookDto.getUserId()).putBookId(bookDto.getId());
-        BookEntity bookEntity = new BookEntity(bookDto);
-        bookEntities.put(bookEntity.getId(), bookEntity);
-        bookDto = bookEntity.makeBookDto();
-
-        log.info("created new book with id:{}", bookEntity.getId());
+        workCheck();
+        bookDto=bookStorage.createBook(bookDto);
+        log.info("created new book with id:{}", bookDto.getId());
 
         return bookDto;
     }
 
     public UserDto getUserById(Long id) {
-        if (!userEntities.containsKey(id)){
-            throw new NotFoundException("cant find user with id: "+id.toString());
-        }
-        return userEntities.get(id).makeUserDto();
+        workCheck();
+        return userStorage.getUserById(id);
     }
 
     public List<Long> getAllUserBooks(Long id) {
-        if (!userEntities.containsKey(id)){
-            throw new NotFoundException("cant find user with id: "+id.toString());
-        }
-        return userEntities.get(id).getBooksId();
+        workCheck();
+        return userStorage.getAllUserBooks(id);
     }
 
     public BookDto getBookById(Long id) {
-        if (!bookEntities.containsKey(id)){
-            throw new NotFoundException("cant find book with id: "+id.toString());
-        }
-        return bookEntities.get(id).makeBookDto();
+        workCheck();
+        return bookStorage.getBookById(id);
     }
 
     public void deleteUser(Long id) {
-        if (!userEntities.containsKey(id)){
-            throw new NotFoundException("cant find user with id: "+id.toString());
-        }
-        userEntities.remove(id);
+        workCheck();
+        userStorage.deleteUser(id);
     }
 
     public void deleteBook(Long id) {
-        if (!bookEntities.containsKey(id)){
-            throw new NotFoundException("cant find book with id: "+id.toString());
-        }
-        bookEntities.remove(id);
+        workCheck();
+        bookStorage.deleteBook(id);
     }
 
-    public UserDto updateUser(UserDto userDto) {
-        if (!bookEntities.containsKey(userDto.getId())){
-            throw new NotFoundException("cant find user with id"+userDto.getId());
-        }
-        userEntities.get(userDto.getId()).setAge(userDto.getAge());
-        userEntities.get(userDto.getId()).setName(userDto.getFullName());
-        userEntities.get(userDto.getId()).setTitle(userDto.getTitle());
-
-        return userEntities.get(userDto.getId()).makeUserDto();
+    public UserDto updateUser(UserEntity userEntity) {
+        workCheck();
+        return userStorage.updateUser(userEntity);
     }
 
-    public void deleteBookFromUser(BookDto bookDto){
-        if (!bookEntities.containsKey(bookDto.getUserId())){
-            throw new NotFoundException("cant find user with id"+bookDto.getUserId());
+    public void deleteBookFromUser(BookDto bookDto) {
+        workCheck();
+        userStorage.deleteBookFromUser(bookDto);
+    }
+
+    public void addBookToUser(BookDto bookDto){
+        workCheck();
+        userStorage.addBookToUser(bookDto);
+    }
+
+    //simulates 10% probability of database drop
+    private void workCheck(){
+        if (Math.random()*100<10){
+            throw new CantAccessException("can't access to database");
         }
-        userEntities.get(bookDto.getUserId()).removeConcreteBook(bookDto.getId());
     }
 }
