@@ -1,6 +1,5 @@
 package com.edu.ulab.app.service.impl;
 
-import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.exception.NotFoundException;
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserDto getUserById(Long id) throws NotFoundException {
         // реализовать недстающие методы
         log.info("Get user by id: {}", id);
         return userMapper.personToUserDto(userRepository.findById(id).orElseThrow(

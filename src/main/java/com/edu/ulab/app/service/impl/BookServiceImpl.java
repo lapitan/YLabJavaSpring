@@ -38,6 +38,7 @@ public class BookServiceImpl implements BookService {
     public BookDto createBook(BookDto bookDto) {
         Book book = bookMapper.bookDtoToBook(bookDto);
         log.info("Mapped book: {}", book);
+        Optional<Person> optionalPerson= userRepository.findById(bookDto.getUserId());
         Person person= userRepository.findById(bookDto.getUserId()).orElseThrow(
                 ()-> new CreateException("cant add book to user with id: "+bookDto.getUserId()));
         book.setPerson(person);

@@ -1,35 +1,36 @@
 package com.edu.ulab.app.entity;
 
 
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
-@Data
+@Table(name = "person", schema = "ulab_edu")
 public class Person {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")
+    @SequenceGenerator(name = "sequence", sequenceName = "sequence", allocationSize = 100)
     private Long id;
-    @OneToMany(mappedBy = "person",cascade = CascadeType.ALL)
-    private List<Book> books;
 
-    @NotNull
-    @NotBlank
+    @Column(nullable = false)
     private String fullName;
 
-    @NotNull
-    @NotBlank
+    @Column(nullable = false)
     private String title;
 
-    @Min(18)
+    @Column(nullable = false)
     private int age;
+
+//    @Column(nullable = false)
+//    private int count;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<Book> bookSet;
 }

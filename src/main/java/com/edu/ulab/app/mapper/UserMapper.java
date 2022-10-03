@@ -5,7 +5,6 @@ import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.web.request.UserRequest;
 import com.edu.ulab.app.web.request.UserRequestWithId;
 import org.mapstruct.Mapper;
-import org.springframework.jdbc.core.RowMapper;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

@@ -5,7 +5,6 @@ import com.edu.ulab.app.entity.Book;
 import com.edu.ulab.app.web.request.BookRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.jdbc.core.RowMapper;
 
 @Mapper(componentModel = "spring")
 public interface BookMapper {
@@ -17,6 +16,4 @@ public interface BookMapper {
     Book bookDtoToBook(BookDto bookDto);
 
     BookDto bookToBookDto(Book book);
-
-
 }
